@@ -1,13 +1,11 @@
+// src/server.js
+
 import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import { env } from './utils/env.js';
-
 import { getAllStudents, getStudentById } from './services/students.js';
-
 const PORT = Number(env('PORT', '3000'));
-dotenv.config();
 export const setupServer = () => {
   const app = express();
 
@@ -24,10 +22,9 @@ export const setupServer = () => {
 
   app.get('/', (req, res) => {
     res.json({
-      message: 'Hello World!',
+      message: 'Hello world!',
     });
   });
-
   app.get('/students', async (req, res) => {
     const students = await getAllStudents();
     console.log(students);
@@ -53,6 +50,7 @@ export const setupServer = () => {
       data: student,
     });
   });
+
   app.use('*', (req, res, next) => {
     res.status(404).json({
       message: 'Not found',
