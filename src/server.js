@@ -4,9 +4,11 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { env } from './utils/env.js';
 
+import { getAllStudents, getStudentById } from './services/students.js';
+
 const PORT = Number(env('PORT', '3000'));
 dotenv.config();
-export const startServer = () => {
+export const setupServer = () => {
   const app = express();
 
   app.use(express.json());
@@ -26,6 +28,31 @@ export const startServer = () => {
     });
   });
 
+  app.get('/students', async (req, res) => {
+    const students = await getAllStudents();
+    console.log(students);
+
+    res.status(200).json({
+      message: 'Successfully found contacts!',
+      data: students,
+    });
+  });
+
+  app.get('/students/:studentId', async (req, res, next) => {
+    const { studentId } = req.params;
+    const student = await getStudentById(studentId);
+
+    if (!student) {
+      res.status(404).json({
+        message: 'Student not found',
+      });
+      return;
+    }
+
+    res.status(200).json({
+      data: student,
+    });
+  });
   app.use('*', (req, res, next) => {
     res.status(404).json({
       message: 'Not found',
