@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "goit-node-js",
   "type": "module",
-  "main": "src/index.js",
+  "main": "index.js",
   "scripts": {
     "get-all": "node src/scripts/getAllContacts",
     "generate": "node src/scripts/generateContacts.js",
