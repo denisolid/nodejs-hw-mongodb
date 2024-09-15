@@ -41,13 +41,14 @@ export const setupServer = () => {
 
     if (!student) {
       res.status(404).json({
-        message: 'Student not found',
+        message: `Contact not found ${studentId}`,
       });
       return;
     }
 
     res.status(200).json({
       data: student,
+      message: `Successfully found contact with id ${studentId}!`,
     });
   });
 
