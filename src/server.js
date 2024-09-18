@@ -25,30 +25,30 @@ export const setupServer = () => {
       message: 'Hello world!',
     });
   });
-  app.get('/students', async (req, res) => {
-    const students = await getAllStudents();
-    console.log(students);
+  app.get('/contacts', async (req, res) => {
+    const contacts = await getAllStudents();
+    console.log(contacts);
 
     res.status(200).json({
       message: 'Successfully found contacts!',
-      data: students,
+      data: contacts,
     });
   });
 
-  app.get('/students/:studentId', async (req, res, next) => {
-    const { studentId } = req.params;
-    const student = await getStudentById(studentId);
+  app.get('/contacts/:contactId', async (req, res, next) => {
+    const { contactId } = req.params;
+    const contact = await getStudentById(contactId);
 
-    if (!student) {
+    if (!contact) {
       res.status(404).json({
-        message: `Contact not found ${studentId}`,
+        message: `Contact not found ${contactId}`,
       });
       return;
     }
 
     res.status(200).json({
-      data: student,
-      message: `Successfully found contact with id ${studentId}!`,
+      data: contact,
+      message: `Successfully found contact with id ${contactId}!`,
     });
   });
 
