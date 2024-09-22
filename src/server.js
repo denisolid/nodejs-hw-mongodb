@@ -32,6 +32,7 @@ export const setupServer = () => {
     res.status(200).json({
       message: 'Successfully found contacts!',
       data: contacts,
+      status: 200,
     });
   });
 
@@ -42,6 +43,7 @@ export const setupServer = () => {
     if (!contact) {
       res.status(404).json({
         message: `Contact not found ${contactId}`,
+        status: 404,
       });
       return;
     }
@@ -49,12 +51,14 @@ export const setupServer = () => {
     res.status(200).json({
       data: contact,
       message: `Successfully found contact with id ${contactId}!`,
+      status: 200,
     });
   });
 
   app.use('*', (req, res, next) => {
     res.status(404).json({
       message: 'Not found',
+      status: 404,
     });
   });
 
@@ -62,6 +66,7 @@ export const setupServer = () => {
     res.status(500).json({
       message: 'Something went wrong',
       error: err.message,
+      status: 500,
     });
   });
 
