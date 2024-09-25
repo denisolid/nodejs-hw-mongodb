@@ -24,6 +24,13 @@ export const setupServer = () => {
     }),
   );
 
+  app.use(cors());
+  app.use(
+    express.json({
+      type: ['application/json', 'application/vnd.api+json'],
+    }),
+  );
+
   app.get('/', (req, res) => {
     res.json({
       message: 'Hello World!',
