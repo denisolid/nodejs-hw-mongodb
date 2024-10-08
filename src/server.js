@@ -17,30 +17,15 @@ export const setupServer = () => {
 
   app.use(express.json());
   app.use(cors());
-  app.use(router);
   app.use(cookieParser());
-  app.use(
-    pino({
-      transport: {
-        target: 'pino-pretty',
-      },
-    }),
-  );
 
-  app.use(cors());
   app.use(
     express.json({
       type: ['application/json', 'application/vnd.api+json'],
     }),
   );
 
-  app.get('/', (req, res) => {
-    res.json({
-      message: 'Hello World!',
-    });
-  });
-
-  app.use(contactsRouter);
+  app.use(router);
   app.use('*', notFoundHandler);
 
   app.use(errorHandler);
