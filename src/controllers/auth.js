@@ -3,14 +3,15 @@ import { loginUser } from '../services/auth.js';
 import { THIRTY_DAYS } from '../constants/index.js';
 import { logoutUser } from '../services/auth.js';
 import { refreshUsersSession } from '../services/auth.js';
+import { responseAuth } from '../services/responseAuth.js';
 
 export const registerUserController = async (req, res) => {
   const user = await registerUser(req.body);
-
+  const responseData = responseAuth(user);
   res.status(201).json({
     status: 201,
     message: 'Successfully registered a user!',
-    data: user,
+    data: responseData,
   });
 };
 
