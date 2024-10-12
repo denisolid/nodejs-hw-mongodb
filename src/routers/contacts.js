@@ -13,49 +13,42 @@ import { updateContactSchema } from '../validation/contacts.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { authenticate } from '../middlewares/authenticate.js';
-import { checkRoles } from '../middlewares/checkRoles.js';
-import { ROLES } from '../constants/index.js';
+import { checkUserById } from '../services/checkUserById.js';
+import { upload } from '../middlewares/multer.js';
 
 const router = Router();
-
-router.get(
-  '/contacts',
-  checkRoles(ROLES.USER),
-  ctrlWrapper(getContactsController),
-);
-router.get(
-  '/contacts/:contactId',
-  checkRoles(ROLES.USER),
-  isValidId,
-  ctrlWrapper(getContactByIdController),
-);
+router.use(authenticate);
+router.get('/', checkUserById, ctrlWrapper(getContactsController));
+router.get('/:contactId', checkUserById, ctrlWrapper(getContactByIdController));
 router.post(
-  '/register',
-  checkRoles(ROLES.USER),
+  '/',
+  checkUserById,
+  upload.single('photo'),
   validateBody(createContactSchema),
   ctrlWrapper(createContactController),
 );
 router.delete(
-  '/contacts/:contactId',
-  checkRoles(ROLES.USER),
+  '/:contactId',
+  checkUserById,
   isValidId,
   ctrlWrapper(deleteContactController),
 );
 
 router.put(
-  '/contacts/:contactId',
-  checkRoles(ROLES.USER),
+  '/:contactId',
+  checkUserById,
   isValidId,
+  upload.single('photo'),
   ctrlWrapper(upsertContactController),
 );
 
 router.patch(
-  '/contacts/:contactId',
-  checkRoles(ROLES.USER),
+  '/:contactId',
+  checkUserById,
+  isValidId,
+  upload.single('photo'),
   validateBody(updateContactSchema),
   ctrlWrapper(patchContactController),
 );
-router.use(authenticate);
 
-router.get('/', ctrlWrapper(getContactsController));
 export default router;

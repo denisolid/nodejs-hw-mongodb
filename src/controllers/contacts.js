@@ -9,9 +9,13 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { env } from '../utils/env.js';
 
-export const createContactController = async (req, res) => {
-  const contact = await createContact(req.body);
+export const createContactController = async (req, res, next) => {
+  const reqData = { ...req.body, userId: req.user._id };
+  const contact = await createContact(reqData);
 
   res.status(201).json({
     status: 201,
@@ -31,6 +35,7 @@ export const getContactsController = async (req, res, next) => {
       sortBy,
       sortOrder,
       filter,
+      userId: req.user._id.toString(),
     });
 
     res.json({
@@ -47,6 +52,14 @@ export const getContactByIdController = async (req, res, next) => {
   const { contactId } = req.params;
   const contact = await getContactById(contactId);
 
+  if (contact.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You need to have access rights to this contact',
+    });
+    return;
+  }
+
   if (!contact) {
     throw createHttpError(404, 'Contact not found');
   }
@@ -59,6 +72,14 @@ export const getContactByIdController = async (req, res, next) => {
 };
 export const deleteContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const authContact = await getContactById(contactId);
+  if (authContact.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You need to access rights to this contact',
+    });
+    return;
+  }
   const contact = await deleteContact(contactId);
 
   if (!contact) {
@@ -89,9 +110,36 @@ export const upsertContactController = async (req, res, next) => {
     data: result.contact,
   });
 };
+
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await updateContact(contactId, req.body);
+  const { body } = req;
+  const authContact = await getContactById(contactId);
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY', 'true') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
+  if (authContact.userId.toString() !== req.user._id.toString()) {
+    res.status(401).json({
+      status: 401,
+      message: 'You need to access rights to this contact',
+    });
+    return;
+  }
+
+  const result = await updateContact(contactId, {
+    ...req.body,
+    photo: photoUrl,
+  });
+  // const { result } = await updateContact(contactId, body);
+  console.log(result);
 
   if (!result) {
     next(createHttpError(404, 'Contact not found'));
