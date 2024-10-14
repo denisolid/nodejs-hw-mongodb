@@ -9,7 +9,7 @@ export const createContactSchema = Joi.object({
     .default('personal')
     .required(),
   isFavourite: Joi.boolean().required().default(false),
-  userId: Joi.string().required(),
+  userId: Joi.string(),
 });
 
 export const updateContactSchema = Joi.object({
